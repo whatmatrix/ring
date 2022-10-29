@@ -164,7 +164,6 @@ impl Key {
                 set_encrypt_key!(vpaes_set_encrypt_key, bytes, key_bits, &mut key)?
             }
 
-            #[cfg(not(target_arch = "aarch64"))]
             Implementation::NOHW => {
                 set_encrypt_key!(aes_nohw_set_encrypt_key, bytes, key_bits, &mut key)?
             }
@@ -195,7 +194,6 @@ impl Key {
             ))]
             Implementation::VPAES_BSAES => encrypt_block!(vpaes_encrypt, a, self),
 
-            #[cfg(not(target_arch = "aarch64"))]
             Implementation::NOHW => encrypt_block!(aes_nohw_encrypt, a, self),
         }
     }
@@ -273,7 +271,6 @@ impl Key {
                 });
             }
 
-            #[cfg(not(target_arch = "aarch64"))]
             Implementation::NOHW => {
                 ctr32_encrypt_blocks!(aes_nohw_ctr32_encrypt_blocks, in_out, src, &self.inner, ctr)
             }
@@ -380,7 +377,6 @@ pub enum Implementation {
     ))]
     VPAES_BSAES = 2,
 
-    #[cfg(not(target_arch = "aarch64"))]
     NOHW = 3,
 }
 
@@ -413,22 +409,14 @@ fn detect_implementation(cpu_features: cpu::Features) -> Implementation {
         }
     }
 
-    #[cfg(target_arch = "arm")]
+    #[cfg(any(target_arch = "aarch64", target_arch = "arm"))]
     {
         if cpu::arm::NEON.available(cpu_features) {
             return Implementation::VPAES_BSAES;
         }
     }
 
-    #[cfg(target_arch = "aarch64")]
-    {
-        Implementation::VPAES_BSAES
-    }
-
-    #[cfg(not(target_arch = "aarch64"))]
-    {
-        Implementation::NOHW
-    }
+    Implementation::NOHW
 }
 
 #[cfg(test)]
