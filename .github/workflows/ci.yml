@@ -488,9 +488,8 @@ jobs:
         mode:
           - # debug
 
-        # Coverage collection is Nightly-only
         rust_channel:
-          - nightly
+          - stable
 
         # TODO: targets
         include:
