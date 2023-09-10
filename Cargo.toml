@@ -13,6 +13,7 @@ repository = "https://github.com/briansmith/ring"
 version = "0.16.20"
 
 # Prevent multiple versions of *ring* from being linked into the same program.
+#links = "ring-asm-0.16.20-signpatch"
 links = "ring-asm"
 
 include = [

@@ -332,6 +332,16 @@ impl Context {
         pending[..num_pending].copy_from_slice(self.inner.finish().as_ref());
         Tag(self.outer.finish(pending, num_pending))
     }
+
+    /// Be able to sign without consuming self.
+    pub fn sign_mut(&mut self) -> Tag {
+        let algorithm = self.inner.algorithm();
+        let mut pending = [0u8; digest::MAX_BLOCK_LEN];
+        let pending = &mut pending[..algorithm.block_len];
+        let num_pending = algorithm.output_len;
+        pending[..num_pending].copy_from_slice(self.inner.finish_mut().as_ref());
+        Tag(self.outer.finish_mut(pending, num_pending))
+    }
 }
 
 /// Calculates the HMAC of `data` using the key `key` in one step.

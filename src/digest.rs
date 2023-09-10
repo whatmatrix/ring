@@ -75,6 +75,10 @@ impl BlockContext {
     }
 
     pub(crate) fn finish(mut self, pending: &mut [u8], num_pending: usize) -> Digest {
+        self.finish_mut(pending, num_pending)
+    }
+
+    pub(crate) fn finish_mut(&mut self, pending: &mut [u8], num_pending: usize) -> Digest {
         let block_len = self.algorithm.block_len;
         assert_eq!(pending.len(), block_len);
         assert!(num_pending <= pending.len());
@@ -197,6 +201,13 @@ impl Context {
         let block_len = self.block.algorithm.block_len;
         self.block
             .finish(&mut self.pending[..block_len], self.num_pending)
+    }
+
+    /// Be able to finalize without consuming self.
+    pub fn finish_mut(&mut self) -> Digest {
+        let block_len = self.block.algorithm.block_len;
+        self.block
+            .finish_mut(&mut self.pending[..block_len], self.num_pending)
     }
 
     /// The algorithm that this context is using.
